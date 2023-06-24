@@ -1,7 +1,58 @@
 <html>
 <head>
 <title>sample</title>
+<link rel="stylesheet" href="./css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+<script src="./js/pose.js"></script>
+
 </head>
 <body>
+    <main>
+        <section style="width:800px;margin:0 auto;overflow:hidden;">
+            <div style="float:left;width:360px;height:440px;border:solid 1px #000;">
+                <p>お手本</p>
+            </div>
+            <div style="float:right;width:360px;height:440px;border:solid 1px #000;">
+                <video class="input_video" style="display:none;"></video>
+                <canvas class="output_canvas" width="360px" height="440px"></canvas>
+                <div id="start" onclick="start();">start</div>
+                <div id="stop" onclick="stop();">stop</div>
+            </div>
+        </section>
+        <section style="clear:both;width:800px;margin:0 auto;margin-top:30px;">
+            <div style="width:800px;border:solid 1px #000;height:300px;">
+                <p>canvas</p>
+            </div>
+        </section>
+
+
+    </main>
 </body>
 </html>
+
+<script>
+const videoElement = document.getElementsByClassName('input_video')[0];
+const canvasElement = document.getElementsByClassName('output_canvas')[0];
+const canvasCtx = canvasElement.getContext('2d');
+const camera = new Camera(videoElement, {
+    onFrame: async () => {
+        await draw_image(videoElement);
+    },
+      width: 360,
+      height: 440
+});
+function start(){
+    console.log("start");
+    camera.start();
+}function stop(){
+    console.log("stop");
+    camera.stop();
+}
+
+function draw_image(image){
+    console.log("image");
+}
+</script>
+
