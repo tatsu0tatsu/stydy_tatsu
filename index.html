@@ -3,6 +3,7 @@
 <title>sample</title>
 <link rel="stylesheet" href="./css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
 <script src="./js/pose.js"></script>
@@ -38,7 +39,7 @@ const canvasElement = document.getElementsByClassName('output_canvas')[0];
 const canvasCtx = canvasElement.getContext('2d');
 const camera = new Camera(videoElement, {
     onFrame: async () => {
-        await draw_image(videoElement);
+        await pose.send({image: videoElement});
     },
       width: 360,
       height: 440
@@ -51,8 +52,35 @@ function start(){
     camera.stop();
 }
 
-function draw_image(image){
-    console.log("image");
+function onResults(results) {
+  canvasCtx.save();
+  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+  canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+  drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS,
+                 {color: '#ffffff', lineWidth: 4});
+  drawLandmarks(canvasCtx, results.poseLandmarks,
+                {color: '#ffddff', lineWidth: 2});
+  canvasCtx.restore();
 }
+
+const pose = new Pose({locateFile: (file) => {
+      return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
+}});
+pose.setOptions({
+      modelComplexity: 1,
+      smoothLandmarks: true,
+      enableSegmentation: true,
+      smoothSegmentation: true,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5
+});
+pose.onResults(onResults);
+
+function draw_image(img){
+
+}
+
+
+
 </script>
 
