@@ -13,7 +13,9 @@
     <main>
         <section style="width:800px;margin:0 auto;overflow:hidden;">
             <div style="float:left;width:360px;height:440px;border:solid 1px #000;">
-                <p>お手本</p>
+
+                <video src="./video/side.mp4" type="vide/mp4"width="360px" style="display:none;"></video>
+                <canvas id="output_video"></canvas>
             </div>
             <div style="float:right;width:360px;height:440px;border:solid 1px #000;">
                 <video class="input_video" style="display:none;"></video>
@@ -76,9 +78,7 @@ pose.setOptions({
 });
 pose.onResults(onResults);
 
-function draw_image(img){
 
-}
 
 
 
