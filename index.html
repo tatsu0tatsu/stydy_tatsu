@@ -65,11 +65,11 @@
 
     
 function v_pri(v){
-console.log(v);
-v_context.drawImage(v,0,0,360,440);
-pose.send({image:v});
+
+pose1.send({image:v});
     console.log("go");
 }
+
 
 
 const videoElement = document.getElementsByClassName('input_video')[0];
@@ -82,6 +82,7 @@ const camera = new Camera(videoElement, {
       width: 360,
       height: 440
 });
+
 function start(){
     console.log("start");
     camera.start();
@@ -114,6 +115,29 @@ pose.setOptions({
 });
 pose.onResults(onResults);
 
+function onResults1(results) {
+    v_context.save();
+    v_context.clearRect(0, 0, v_canvas.width, v_canvas.height);
+    v_context.drawImage(results.image, 0, 0, v_canvas.width, v_canvas.height);
+  drawConnectors(v_context, results.poseLandmarks, POSE_CONNECTIONS,
+                 {color: '#ffffff', lineWidth: 4});
+  drawLandmarks(v_context, results.poseLandmarks,
+                {color: '#ffddff', lineWidth: 2});
+  v_context.restore();
+}
+
+const pose1 = new Pose({locateFile: (file) => {
+      return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
+}});
+pose1.setOptions({
+      modelComplexity: 1,
+      smoothLandmarks: true,
+      enableSegmentation: true,
+      smoothSegmentation: true,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5
+});
+pose1.onResults(onResults1);
 
 
 
