@@ -14,8 +14,9 @@
         <section style="width:800px;margin:0 auto;overflow:hidden;">
             <div style="float:left;width:360px;height:440px;border:solid 1px #000;">
 
-                <video src="./video/side.mp4" type="vide/mp4"width="360px" style="display:none;"></video>
-                <canvas id="output_video"></canvas>
+                <video src="./video/side.mp4" id="v" width="360" style="display:none;"></video>
+                <canvas id="c" width="360" height="440"></canvas>
+
             </div>
             <div style="float:right;width:360px;height:440px;border:solid 1px #000;">
                 <video class="input_video" style="display:none;"></video>
@@ -29,13 +30,48 @@
                 <p>canvas</p>
             </div>
         </section>
-
-
+    
+        
     </main>
+    
+
 </body>
 </html>
 
 <script>
+
+    var v = document.getElementById('v');
+    v.muted = true;
+    var v_flag=0;
+
+    var v_canvas=document.getElementById('c');
+    v_context=v_canvas.getContext("2d");
+
+    v.addEventListener('play', function() {
+    console.log("start");
+    const intervalId=setInterval(()=>{
+    v_pri(v);
+    if(v_flag==1){
+        clearInterval(intervalId);
+    }},100);
+
+    })
+    v.addEventListener('ended', function() {
+    console.log("end");
+    v_flag=1;
+    })
+
+    v.play();
+
+    
+function v_pri(v){
+console.log(v);
+v_context.drawImage(v,0,0,360,440);
+pose.send({image:v});
+    console.log("go");
+}
+
+
 const videoElement = document.getElementsByClassName('input_video')[0];
 const canvasElement = document.getElementsByClassName('output_canvas')[0];
 const canvasCtx = canvasElement.getContext('2d');
@@ -77,7 +113,6 @@ pose.setOptions({
       minTrackingConfidence: 0.5
 });
 pose.onResults(onResults);
-
 
 
 
