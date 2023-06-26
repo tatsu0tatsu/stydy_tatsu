@@ -116,6 +116,25 @@ pose.setOptions({
 pose.onResults(onResults);
 
 function onResults1(results) {
+
+    var point1=[results.poseLandmarks[13].x,results.poseLandmarks[13].y];
+    var point2=[results.poseLandmarks[11].x,results.poseLandmarks[11].y];
+    var point3=[results.poseLandmarks[23].x,results.poseLandmarks[23].y];
+    
+    var va=[point1[0]-point2[0],point1[1]-point2[1]];
+    var vb=[point3[0]-point2[0],point3[1]-point2[1]];
+
+    var dot=va[0]*vb[0]+va[1]*vb[1];
+    var absa=Math.sqrt(va[0]*va[0]+va[1]*va[1]);
+    var absb=Math.sqrt(vb[0]*vb[0]+vb[1]*vb[1]);
+
+    var ans=Math.acos(dot/(absa*absb))*(180 / Math.PI);
+    console.log(ans);
+/* 
+    var res=(va1*va2+vb1*vb2)/(Math.sqrt(va1*va1+va2*va2)*Math.sqrt(vb1*vb1+vb2*vb2));
+    res=Math.acos(res)*(180/Math.PI);
+    console.log(res);*/
+
     v_context.save();
     v_context.clearRect(0, 0, v_canvas.width, v_canvas.height);
     v_context.drawImage(results.image, 0, 0, v_canvas.width, v_canvas.height);
