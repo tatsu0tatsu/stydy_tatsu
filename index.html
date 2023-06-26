@@ -13,7 +13,7 @@
         <section style="width:800px;margin:0 auto;overflow:hidden;">
             <div style="float:left;width:360px;height:440px;border:solid 1px #000;">
 
-                <video src="./video/side.mp4" id="v" width="360" style="display:none;"></video>
+                <video src="./video/side2.mp4" id="v" width="360" style="display:none;"></video>
                 <canvas id="c" width="360" height="440"></canvas>
 
             </div>
@@ -86,6 +86,7 @@ const camera = new Camera(videoElement, {
 function start(){
     console.log("start");
     camera.start();
+    
 }function stop(){
     console.log("stop");
     v.loop=false;
@@ -94,6 +95,8 @@ function start(){
 }
 
 function onResults(results) {
+    if(results.poseLandmarks!=undefined){
+    
     var point1=[results.poseLandmarks[13].x,results.poseLandmarks[13].y];
     var point2=[results.poseLandmarks[11].x,results.poseLandmarks[11].y];
     var point3=[results.poseLandmarks[23].x,results.poseLandmarks[23].y];
@@ -107,6 +110,9 @@ function onResults(results) {
 
     var ans=Math.acos(dot/(absa*absb))*(180 / Math.PI);
     console.log("人:"+ans);
+    }
+
+
 
   canvasCtx.save();
   canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
@@ -146,10 +152,7 @@ function onResults1(results) {
 
     var ans=Math.acos(dot/(absa*absb))*(180 / Math.PI);
     console.log("正しい:"+ans);
-/* 
-    var res=(va1*va2+vb1*vb2)/(Math.sqrt(va1*va1+va2*va2)*Math.sqrt(vb1*vb1+vb2*vb2));
-    res=Math.acos(res)*(180/Math.PI);
-    console.log(res);*/
+
 
     v_context.save();
     v_context.clearRect(0, 0, v_canvas.width, v_canvas.height);
