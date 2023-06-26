@@ -3,7 +3,6 @@
 <title>sample</title>
 <link rel="stylesheet" href="./css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
 <script src="./js/pose.js"></script>
@@ -23,6 +22,7 @@
                 <canvas class="output_canvas" width="360px" height="440px"></canvas>
                 <div id="start" onclick="start();">start</div>
                 <div id="stop" onclick="stop();">stop</div>
+                <div id="good" onclick="goodmove();">start2</div>
             </div>
         </section>
         <section style="clear:both;width:800px;margin:0 auto;margin-top:30px;">
@@ -39,14 +39,16 @@
 </html>
 
 <script>
-
     var v = document.getElementById('v');
-    v.muted = true;
-    var v_flag=0;
-
     var v_canvas=document.getElementById('c');
-    v_context=v_canvas.getContext("2d");
+    var v_context=v_canvas.getContext("2d");
+function goodmove()
+{
 
+    
+    v.muted = true;
+    v.loop=true;
+    var v_flag=0;
     v.addEventListener('play', function() {
     console.log("start");
     const intervalId=setInterval(()=>{
@@ -62,19 +64,17 @@
     })
 
     v.play();
-
+}
     
 function v_pri(v){
 
-pose1.send({image:v});
-    console.log("go");
+    pose1.send({image:v});
 }
-
-
-
 const videoElement = document.getElementsByClassName('input_video')[0];
 const canvasElement = document.getElementsByClassName('output_canvas')[0];
 const canvasCtx = canvasElement.getContext('2d');
+
+
 const camera = new Camera(videoElement, {
     onFrame: async () => {
         await pose.send({image: videoElement});
@@ -88,10 +88,26 @@ function start(){
     camera.start();
 }function stop(){
     console.log("stop");
+    v.loop=false;
+    v.currentTime=14.5;
     camera.stop();
 }
 
 function onResults(results) {
+    var point1=[results.poseLandmarks[13].x,results.poseLandmarks[13].y];
+    var point2=[results.poseLandmarks[11].x,results.poseLandmarks[11].y];
+    var point3=[results.poseLandmarks[23].x,results.poseLandmarks[23].y];
+    
+    var va=[point1[0]-point2[0],point1[1]-point2[1]];
+    var vb=[point3[0]-point2[0],point3[1]-point2[1]];
+
+    var dot=va[0]*vb[0]+va[1]*vb[1];
+    var absa=Math.sqrt(va[0]*va[0]+va[1]*va[1]);
+    var absb=Math.sqrt(vb[0]*vb[0]+vb[1]*vb[1]);
+
+    var ans=Math.acos(dot/(absa*absb))*(180 / Math.PI);
+    console.log("人:"+ans);
+
   canvasCtx.save();
   canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
   canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
@@ -129,7 +145,7 @@ function onResults1(results) {
     var absb=Math.sqrt(vb[0]*vb[0]+vb[1]*vb[1]);
 
     var ans=Math.acos(dot/(absa*absb))*(180 / Math.PI);
-    console.log(ans);
+    console.log("正しい:"+ans);
 /* 
     var res=(va1*va2+vb1*vb2)/(Math.sqrt(va1*va1+va2*va2)*Math.sqrt(vb1*vb1+vb2*vb2));
     res=Math.acos(res)*(180/Math.PI);
@@ -157,8 +173,6 @@ pose1.setOptions({
       minTrackingConfidence: 0.5
 });
 pose1.onResults(onResults1);
-
-
 
 </script>
 
