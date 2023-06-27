@@ -5,7 +5,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
-<script src="./js/pose.js"></script>
 
 </head>
 <body>
@@ -39,13 +38,14 @@
 </html>
 
 <script>
+var goodmove_value=0;
+var mymove_value=0;
+
     var v = document.getElementById('v');
     var v_canvas=document.getElementById('c');
     var v_context=v_canvas.getContext("2d");
 function goodmove()
 {
-
-    
     v.muted = true;
     v.loop=true;
     var v_flag=0;
@@ -109,7 +109,8 @@ function onResults(results) {
     var absb=Math.sqrt(vb[0]*vb[0]+vb[1]*vb[1]);
 
     var ans=Math.acos(dot/(absa*absb))*(180 / Math.PI);
-    console.log("人:"+ans);
+    mymove_value=ans;
+
     }
 
 
@@ -138,7 +139,7 @@ pose.setOptions({
 pose.onResults(onResults);
 
 function onResults1(results) {
-
+    if(results.poseLandmarks!=undefined){
     var point1=[results.poseLandmarks[13].x,results.poseLandmarks[13].y];
     var point2=[results.poseLandmarks[11].x,results.poseLandmarks[11].y];
     var point3=[results.poseLandmarks[23].x,results.poseLandmarks[23].y];
@@ -151,8 +152,11 @@ function onResults1(results) {
     var absb=Math.sqrt(vb[0]*vb[0]+vb[1]*vb[1]);
 
     var ans=Math.acos(dot/(absa*absb))*(180 / Math.PI);
-    console.log("正しい:"+ans);
+    goodmove_value=ans;
+    console.log(Math.abs(goodmove_value-mymove_value));
 
+
+    }
 
     v_context.save();
     v_context.clearRect(0, 0, v_canvas.width, v_canvas.height);
