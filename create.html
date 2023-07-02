@@ -1,0 +1,97 @@
+<html>
+<head>
+<title>sample</title>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+
+</head>
+<body>
+
+    <video src="./video/side2.mp4" id="v" width="360" style="display:none;"></video>
+    <canvas id="c" width="360" height="440"></canvas>
+    <div id="start" onclick="start();">start</div>
+    <div id="stop" onclick="download_text();">download</div>
+
+</body>
+</html>
+
+<script>
+
+pose_lists=[];
+
+var v = document.getElementById('v');
+var v_canvas=document.getElementById('c');
+var v_context=v_canvas.getContext("2d");
+
+function start(){
+    v.muted = true;
+    var v_flag=0;
+
+    v.addEventListener('play', function() {
+        console.log("start");
+        const intervalId=setInterval(()=>{
+            v_pri(v);
+            if(v_flag==1){
+                clearInterval(intervalId);
+        }},100);
+    })  
+    v.addEventListener('ended', function() {
+        console.log("end");
+        v_flag=1;
+    })
+
+    v.play();
+}
+
+function v_pri(v){
+    pose1.send({image:v});
+}
+
+function onResults1(results) {
+    var list=[];
+    v_context.save();
+    v_context.clearRect(0, 0, v_canvas.width, v_canvas.height);
+    v_context.drawImage(results.image, 0, 0, v_canvas.width, v_canvas.height);
+    drawConnectors(v_context, results.poseLandmarks, POSE_CONNECTIONS, {color: '#ffffff', lineWidth: 4});
+    drawLandmarks(v_context, results.poseLandmarks,{color: '#ffddff', lineWidth: 2});
+     v_context.restore();
+
+     for(i=0;i<results.poseLandmarks.length;i++){
+        list.push(results.poseLandmarks[i].x.toFixed(4)+","+results.poseLandmarks[i].y.toFixed(4));
+     }
+     list.push("cut");
+     console.log(list.toString());
+     pose_lists.push(list.toString());
+
+}
+
+const pose1 = new Pose({locateFile: (file) => {
+      return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
+}});
+
+pose1.setOptions({
+      modelComplexity: 1,
+      smoothLandmarks: true,
+      enableSegmentation: true,
+      smoothSegmentation: true,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5
+});
+
+pose1.onResults(onResults1);
+
+
+function download_text(){
+
+console.log(pose_lists.toString(a));
+
+    const blob = new Blob([pose_lists.toString()],{type:"text/plain"});
+const link = document.createElement('a');
+link.href = URL.createObjectURL(blob);
+link.download = 'sample.txt';
+link.click();
+
+}
+
+</script>

@@ -9,7 +9,7 @@ function sounds(sound_value){
     if(!Audio_flag){
         oscillator.stop();
         Audio_flag=true;
-        console.log("he");
+  
     }
         oscillator=Audio_ctx.createOscillator();
         oscillator.type = "triangle";
@@ -17,7 +17,6 @@ function sounds(sound_value){
         oscillator.connect(gainNode).connect(Audio_ctx.destination);
         oscillator.start();
         Audio_flag=false;
-        console.log("yo");
 }
 
 function sounds_stop(){
