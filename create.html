@@ -11,7 +11,10 @@
     <video src="./video/side2.mp4" id="v" width="360" style="display:none;"></video>
     <canvas id="c" width="360" height="440"></canvas>
     <div id="start" onclick="start();">start</div>
-    <div id="stop" onclick="download_text();">download</div>
+    <div id="download" onclick="download();">download</div>
+    <form>
+        <input id="file" type="file" name="file">
+    </form>
 
 </body>
 </html>
@@ -82,16 +85,50 @@ pose1.setOptions({
 pose1.onResults(onResults1);
 
 
-function download_text(){
-
-console.log(pose_lists.toString(a));
-
-    const blob = new Blob([pose_lists.toString()],{type:"text/plain"});
+function download(){
+    console.log(pose_lists.toString());
+const blob = new Blob([pose_lists.toString()],{type:"text/plain"});
 const link = document.createElement('a');
 link.href = URL.createObjectURL(blob);
 link.download = 'sample.txt';
 link.click();
+}
 
+let input = document.getElementById('file');
+let reader = new FileReader();
+input.addEventListener('change', () => {
+    for(file of input.files){
+        //Fileオブジェクト(テキストファイル)のファイル内容を読み込む
+        reader.readAsText(file, 'UTF-8');
+        //ファイルの読み込み完了後に内容をコンソールに出力する
+        reader.onload = ()=> {
+          //  console.log(reader.result);
+            get_text(reader.result);
+        };
+    }
+});
+function get_text(texts){
+    var arr=texts.split(',');
+
+    var cut_count=0;
+    var count=0;
+    var result_arr=[];
+    var sub=new Array(66);
+
+    for(i=0;i<arr.length;i++){
+        if(arr[i]=='cut'){
+            cut_count++;
+            result_arr.push(sub.concat());
+        }
+    }
+
+    for(i=0;i<cut_count;i++){
+        for(j=0;j<66;j++){
+            result_arr[i][j]=arr[i*66+j+i];
+        }
+    }
+
+    console.log(result_arr);
 }
 
 </script>
