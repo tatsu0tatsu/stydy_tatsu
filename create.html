@@ -15,6 +15,7 @@
     <form>
         <input id="file" type="file" name="file">
     </form>
+    <canvas id="c2" width="360" height="440"></canvas>
 
 </body>
 </html>
@@ -107,9 +108,9 @@ input.addEventListener('change', () => {
         };
     }
 });
+
 function get_text(texts){
     var arr=texts.split(',');
-
     var cut_count=0;
     var count=0;
     var result_arr=[];
@@ -127,8 +128,30 @@ function get_text(texts){
             result_arr[i][j]=arr[i*66+j+i];
         }
     }
+    marker(result_arr,cut_count);
+}
 
-    console.log(result_arr);
+var c2=document.getElementById('c2');
+var c2_context=c2.getContext("2d");
+
+function marker(bodydata,cut_count) {
+    console.log(bodydata);
+    let body_count=0;
+
+
+    const intervalId=setInterval(()=>{
+            console.log(body_count);
+            
+            c2_context.save();
+            c2_context.clearRect(0, 0, c2.width, c2.height);
+            for(i=0;i<66;i=i+2){
+                c2_context.fillRect(bodydata[body_count][i]*c2.width,bodydata[body_count][i+1]*c2.height,10,10);
+            }
+            c2_context.restore();
+            body_count++;
+            if(body_count==cut_count){
+                clearInterval(intervalId);
+        }},100);
 }
 
 </script>
