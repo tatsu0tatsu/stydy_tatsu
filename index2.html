@@ -1,15 +1,204 @@
 <html>
     <head>
         <title>sound</title>
+        <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+
     </head>
     <body>
 
 <button onclick="sounds0(261.626);">start</button>
 <button onclick="sounds_stop0();">stop</button><br>
-<button onclick="sounds1(293.665);">start</button>
+<button onclick="sounds1(349.228);">start</button>
 <button onclick="sounds_stop1();">stop</button><br>
-<button onclick="sounds2(391.995);">start</button>
+<button onclick="sounds2(293.665);">start</button>
 <button onclick="sounds_stop2();">stop</button>
+
+<div style="width:360px;height:440px;border:solid 1px #000;">
+    <video class="input_video" style="display:none;"></video>
+    <canvas class="output_canvas" width="360px" height="440px"></canvas>
+
+</div>
+<div id="start" onclick="start();">start</div>
+<div id="stop" onclick="stop();">stop</div>
+<div style="width:360px;height:440px;border:solid 1px #000;">
+    <canvas id="c" width="360px" height="440px"></canvas>
+    <div id="start" onclick="start();">start</div>
+</div>
+
+<form>
+    <input id="file" type="file" name="file">
+</form>
     </body>
     <script src="./js/sound.js"></script>
 </html>
+
+
+
+<script>
+//ド4:261.626レ4:293.665ソ4:391.995ふぁ4:349.228ど5:523.251	
+//どれふぁ不協和音
+var body_ans=0;
+
+const videoElement = document.getElementsByClassName('input_video')[0];
+const canvasElement = document.getElementsByClassName('output_canvas')[0];
+const canvasCtx = canvasElement.getContext('2d');
+const camera = new Camera(videoElement, {
+    onFrame: async () => {
+        await pose.send({image: videoElement});
+    },
+      width: 360,
+      height: 440
+});
+
+function start(){
+    console.log("start");
+    camera.start();
+    
+}function stop(){
+    console.log("stop");
+    camera.stop();
+}
+
+function onResults(results) {
+    if(results.poseLandmarks!=undefined){
+    
+    var point1=[results.poseLandmarks[13].x,results.poseLandmarks[13].y];
+    var point2=[results.poseLandmarks[11].x,results.poseLandmarks[11].y];
+    var point3=[results.poseLandmarks[23].x,results.poseLandmarks[23].y];
+    
+    var va=[point1[0]-point2[0],point1[1]-point2[1]];
+    var vb=[point3[0]-point2[0],point3[1]-point2[1]];
+
+    var dot=va[0]*vb[0]+va[1]*vb[1];
+    var absa=Math.sqrt(va[0]*va[0]+va[1]*va[1]);
+    var absb=Math.sqrt(vb[0]*vb[0]+vb[1]*vb[1]);
+
+    var ans=Math.acos(dot/(absa*absb))*(180 / Math.PI);
+    body_ans=ans;
+
+ }
+  canvasCtx.save();
+  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+  canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+  drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#ffffff', lineWidth: 4});
+  drawLandmarks(canvasCtx, results.poseLandmarks, {color: '#ffddff', lineWidth: 2});
+  canvasCtx.restore();
+
+}
+
+const pose = new Pose({locateFile: (file) => {
+      return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
+}});
+pose.setOptions({
+      modelComplexity: 1,
+      smoothLandmarks: true,
+      enableSegmentation: true,
+      smoothSegmentation: true,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5
+});
+pose.onResults(onResults);
+
+
+function download(){
+    console.log(pose_lists.toString());
+const blob = new Blob([pose_lists.toString()],{type:"text/plain"});
+const link = document.createElement('a');
+link.href = URL.createObjectURL(blob);
+link.download = 'sample.txt';
+link.click();
+}
+
+let input = document.getElementById('file');
+let reader = new FileReader();
+input.addEventListener('change', () => {
+    for(file of input.files){
+        //Fileオブジェクト(テキストファイル)のファイル内容を読み込む
+        reader.readAsText(file, 'UTF-8');
+        //ファイルの読み込み完了後に内容をコンソールに出力する
+        reader.onload = ()=> {
+          //  console.log(reader.result);
+            get_text(reader.result);
+        };
+    }
+});
+
+function get_text(texts){
+    var arr=texts.split(',');
+    var cut_count=0;
+    var count=0;
+    var result_arr=[];
+    var sub=new Array(66);
+
+    for(i=0;i<arr.length;i++){
+        if(arr[i]=='cut'){
+            cut_count++;
+            result_arr.push(sub.concat());
+        }
+    }
+
+    for(i=0;i<cut_count;i++){
+        for(j=0;j<66;j++){
+            result_arr[i][j]=arr[i*66+j+i];
+        }
+    }
+    console.log(result_arr);
+    marker(result_arr,cut_count);
+}
+var c2=document.getElementById('c');
+var c2_context=c2.getContext("2d");
+
+function marker(bodydata,cut_count) {
+    console.log(bodydata);
+    let body_count=0;
+
+    const intervalId=setInterval(()=>{
+
+            var point1=[bodydata[body_count][13*2],bodydata[body_count][13*2+1]];
+            var point2=[bodydata[body_count][11*2],bodydata[body_count][11*2+1]];
+            var point3=[bodydata[body_count][23*2],bodydata[body_count][23*2+1]];
+            
+            var va=[point1[0]-point2[0],point1[1]-point2[1]];
+            var vb=[point3[0]-point2[0],point3[1]-point2[1]];
+
+            var dot=va[0]*vb[0]+va[1]*vb[1];
+            var absa=Math.sqrt(va[0]*va[0]+va[1]*va[1]);
+            var absb=Math.sqrt(vb[0]*vb[0]+vb[1]*vb[1]);
+
+            var ans=Math.acos(dot/(absa*absb))*(180 / Math.PI);
+
+            console.log(ans,body_ans);
+
+            //sounds0(261.626);
+            if(ans+20>body_ans && ans-20<body_ans){
+                sounds1(261.626);
+                sounds2(523.251);
+            }else{
+                sounds_stop1();
+                sounds_stop2();
+            }
+
+            if(ans+60<body_ans || ans-60>body_ans){
+                sounds3(293.665);
+                sounds4(261.626);
+            }else{
+                sounds_stop3();
+                sounds_stop4();
+            }
+
+            c2_context.save();
+            c2_context.clearRect(0, 0, c2.width, c2.height);
+            for(i=0;i<66;i=i+2){
+                c2_context.fillRect(bodydata[body_count][i]*c2.width,bodydata[body_count][i+1]*c2.height,10,10);
+            }
+            c2_context.restore();
+            body_count++;
+            if(body_count==cut_count){
+                //clearInterval(intervalId);
+                body_count=0;
+        }},100);
+}
+
+</script>

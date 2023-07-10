@@ -39,6 +39,16 @@ const gainNode2 = Audio_ctx2.createGain();
 gainNode2.gain.value = VOLUME;
 nodeflag2=0;
 
+const Audio_ctx3 = new AudioContext();
+const gainNode3 = Audio_ctx3.createGain();
+gainNode3.gain.value = VOLUME;
+nodeflag3=0;
+
+const Audio_ctx4 = new AudioContext();
+const gainNode4 = Audio_ctx4.createGain();
+gainNode4.gain.value = VOLUME;
+nodeflag4=0;
+
 function sounds0(sound_value){
     console.log(nodeflag0);
     if(nodeflag0==0){
@@ -53,8 +63,10 @@ function sounds0(sound_value){
     }
 }
 function sounds_stop0(){
-    oscillator0.stop();
-    nodeflag0=0;
+    if(typeof(oscillator0)!="undefined"){
+        oscillator0.stop();
+        nodeflag0=0;
+    }
 }
 
 function sounds1(sound_value){
@@ -71,8 +83,10 @@ function sounds1(sound_value){
     }
 }
 function sounds_stop1(){
+    if(typeof(oscillator1)!="undefined"){
     oscillator1.stop();
     nodeflag1=0;
+    }
 }
 
 function sounds2(sound_value){
@@ -89,6 +103,48 @@ function sounds2(sound_value){
     }
 }
 function sounds_stop2(){
+    if(typeof(oscillator2)!="undefined"){
     oscillator2.stop();
     nodeflag2=0;
+    }
+}
+
+function sounds3(sound_value){
+    console.log(nodeflag3);
+    if(nodeflag3==0){
+        oscillator3=Audio_ctx3.createOscillator();
+        oscillator3.type = "triangle";
+        oscillator3.frequency.setValueAtTime(sound_value, Audio_ctx3.currentTime);
+        oscillator3.connect(gainNode3).connect(Audio_ctx3.destination);
+        oscillator3.start();
+        nodeflag3=1;
+    }else{
+        console.log("重複");
+    }
+}
+function sounds_stop3(){
+    if(typeof(oscillator3)!="undefined"){
+    oscillator3.stop();
+    nodeflag3=0;
+    }
+}
+
+function sounds4(sound_value){
+    console.log(nodeflag4);
+    if(nodeflag4==0){
+        oscillator4=Audio_ctx4.createOscillator();
+        oscillator4.type = "triangle";
+        oscillator4.frequency.setValueAtTime(sound_value, Audio_ctx4.currentTime);
+        oscillator4.connect(gainNode4).connect(Audio_ctx4.destination);
+        oscillator4.start();
+        nodeflag4=1;
+    }else{
+        console.log("重複");
+    }
+}
+function sounds_stop4(){
+    if(typeof(oscillator4)!="undefined"){
+    oscillator4.stop();
+    nodeflag4=0;
+    }
 }
