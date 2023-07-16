@@ -1,0 +1,161 @@
+<html>
+    <head>
+        <title>sound</title>
+        <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+
+    </head>
+    <body>
+
+
+<div style="width:360px;height:440px;border:solid 1px #000;">
+    <canvas id="c" width="360px" height="440px"></canvas>
+    <div id="start" onclick="start();">start</div>
+</div>
+
+<form>
+    <input id="file" type="file" name="file">
+</form>
+
+
+
+<div>  <img id="img0" src="./img/landmarks0.png" style="width:200px;">
+    <img  id="img1" src="./img/landmarks1.png" style="width:200px;">
+    <img id="img2" src="./img/landmarks2.png"style="width:200px;">
+    <img id="img3" src="./img/landmarks3.png" style="width:200px;"></div>
+ 
+    <button onclick="clickBtn1();">start2</button>
+    </body>
+    <script src="./js/sound.js"></script>
+    <script src="./js/angle.js"></script>
+</html>
+
+
+
+<script>
+var search_angle=[];
+for(i=0;i<4;i++){
+    search_angle[i]=[null,null,null];
+}
+
+document.getElementById('img0').addEventListener('click', () => {
+    if(document.getElementById('img0').style.width=='200px'){    
+        document.getElementById('img0').style.width="150px";
+        search_angle[0]=[15,13,11];
+    }
+    else if(document.getElementById('img0').style.width=='150px'){    
+        document.getElementById('img0').style.width="200px";
+        search_angle[0]=[null,null,null];
+    }
+});
+document.getElementById('img1').addEventListener('click', () => {
+    if(document.getElementById('img1').style.width=='200px'){    
+        document.getElementById('img1').style.width="150px";
+        search_angle[1]=[13,11,23];}
+       else if(document.getElementById('img1').style.width=='150px'){    
+        document.getElementById('img1').style.width="200px";
+        search_angle[1]=[null,null,null];}
+});
+document.getElementById('img2').addEventListener('click', () => {
+    if(document.getElementById('img2').style.width=='200px'){    
+        document.getElementById('img2').style.width="150px";
+        search_angle[2]=[12,14,16];}
+       else if(document.getElementById('img2').style.width=='150px'){    
+        document.getElementById('img2').style.width="200px";
+        search_angle[2]=[null,null,null];}
+});
+document.getElementById('img3').addEventListener('click', () => {
+    if(document.getElementById('img3').style.width=='200px'){    
+        document.getElementById('img3').style.width="150px";
+        search_angle[3]=[14,12,24];}
+       else if(document.getElementById('img3').style.width=='150px'){    
+        document.getElementById('img3').style.width="200px";
+        search_angle[3]=[null,null,null];}
+});
+
+ function clickBtn1() {
+
+    var on_angle=[];
+    for(i=0;i<search_angle.length;i++){
+        if(search_angle[i][0]!=null){
+            on_angle.push(search_angle[i]);
+        }
+    }
+
+    if(reader.result){
+        console.log("go");
+        get_text(reader.result,on_angle);
+    }
+  }
+
+
+function download(){
+    console.log(pose_lists.toString());
+    const blob = new Blob([pose_lists.toString()],{type:"text/plain"});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'sample.txt';
+    link.click();
+}
+
+let input = document.getElementById('file');
+let reader = new FileReader();
+input.addEventListener('change', () => {
+    for(file of input.files){
+        reader.readAsText(file, 'UTF-8');
+    }
+});
+
+
+
+function get_text(texts,on_angle){
+    var arr=texts.split(',');
+    var cut_count=0;
+    var count=0;
+    var result_arr=[];
+    var sub=new Array(66);
+
+    for(i=0;i<arr.length;i++){
+        if(arr[i]=='cut'){
+            cut_count++;
+            result_arr.push(sub.concat());
+        }
+    }
+
+    for(i=0;i<cut_count;i++){
+        for(j=0;j<66;j++){
+            result_arr[i][j]=arr[i*66+j+i];
+        }
+    }
+    console.log(result_arr);
+    marker(result_arr,cut_count);
+}
+var c2=document.getElementById('c');
+var c2_context=c2.getContext("2d");
+
+function marker(bodydata,cut_count) {
+    console.log(bodydata);
+    let body_count=0;
+
+    const intervalId=setInterval(()=>{
+            var ans;
+            var points=[13,11,23];
+            ans=ang(bodydata,body_count,points);
+
+            console.log(points);
+
+            c2_context.save();
+            c2_context.clearRect(0, 0, c2.width, c2.height);
+            for(i=0;i<66;i=i+2){
+                c2_context.fillRect(bodydata[body_count][i]*c2.width,bodydata[body_count][i+1]*c2.height,10,10);
+            }
+            c2_context.restore();
+            body_count++;
+            if(body_count==cut_count){
+                //clearInterval(intervalId);
+                body_count=0;
+        }},100);
+}
+
+</script>
