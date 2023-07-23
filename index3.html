@@ -84,14 +84,14 @@ document.getElementById('img3').addEventListener('click', () => {
     }
 
     if(reader.result){
-        console.log("go");
+
         get_text(reader.result,on_angle);
     }
   }
 
 
 function download(){
-    console.log(pose_lists.toString());
+
     const blob = new Blob([pose_lists.toString()],{type:"text/plain"});
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -128,22 +128,24 @@ function get_text(texts,on_angle){
             result_arr[i][j]=arr[i*66+j+i];
         }
     }
-    console.log(result_arr);
-    marker(result_arr,cut_count);
+
+    marker(result_arr,cut_count,on_angle);
 }
+
 var c2=document.getElementById('c');
 var c2_context=c2.getContext("2d");
 
-function marker(bodydata,cut_count) {
-    console.log(bodydata);
+function marker(bodydata,cut_count,on_angle) {
+
     let body_count=0;
 
     const intervalId=setInterval(()=>{
-            var ans;
-            var points=[13,11,23];
-            ans=ang(bodydata,body_count,points);
-
-            console.log(points);
+            var ans=[];
+            
+            for(i=0;i<on_angle.length;i++){
+                ans[i]=ang(bodydata,body_count,on_angle[i]);
+            }
+            console.log(ans);
 
             c2_context.save();
             c2_context.clearRect(0, 0, c2.width, c2.height);
@@ -157,5 +159,9 @@ function marker(bodydata,cut_count) {
                 body_count=0;
         }},100);
 }
-
+//ドレミファソラシドの音を出力
+//とりあえず紙に設計図を描く、オーサリングツール的なものを作成、様々な音が出せたり
+//様々な動画を使用できたり、角度を指定できたり、それを使って実験検証ができるように
+//新しいファイルで作成する
+//とりあえず角度はシンプルにチェックボックスにする
 </script>

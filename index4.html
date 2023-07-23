@@ -1,0 +1,216 @@
+<html>
+    <head>
+        <title>sound</title>
+        <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+    </head>
+    <body>
+
+<div style="width:800px;">
+
+<div style="float:left;">
+<div style="width:360px;height:440px;border:solid 1px #000;">
+    <video class="input_video" style="display:none;"></video>
+    <canvas class="output_canvas" width="360px" height="440px"></canvas>
+</div>
+
+<button id="start" onclick="start();">start</button>
+<button id="stop" onclick="stop();">stop</dbutton>
+</div>
+
+<div style="float:right;">
+<div style="width:360px;height:440px;border:solid 1px #000;">
+    <canvas id="c" width="360px" height="440px"></canvas>
+    <div id="start" onclick="start();">start</div>
+</div>
+
+<form>
+    <input id="file" type="file" name="file">
+</form>
+</div>
+
+
+<div style="clear:both;">
+</div>
+
+    <div style="float:left;">
+    <button onclick="sounds0(261.626)">C4</button>
+    <button onclick="sounds_stop0()">stop</button><br>
+    <button onclick="sounds1(293.665)">D4</button>
+    <button onclick="sounds_stop1()">stop</button><br>
+    <button onclick="sounds2(329.628)">E4</button>
+    <button onclick="sounds_stop2()">stop</button><br>
+    <button onclick="sounds3(349.228)">F4</button>
+    <button onclick="sounds_stop3()">stop</button><br>
+    <button onclick="sounds4(391.995)">G4</button>
+    <button onclick="sounds_stop4()">stop</button><br>
+    <button onclick="sounds5(440.000)">A4</button>
+    <button onclick="sounds_stop5()">stop</button><br>
+    <button onclick="sounds6(493.883)">B4</button>
+    <button onclick="sounds_stop6()">stop</button><br>
+    <button onclick="sounds7(523.251)">C5</button>
+    <button onclick="sounds_stop7()">stop</button><br>
+</div>
+
+<div style="float:right;">
+<form name="body_form">
+
+    <label><input type="checkbox" name="chk1">右肩</label>
+</form>
+
+</div>
+
+
+</div>
+    </body>
+    <script src="./js/sound.js"></script>
+</html>
+
+
+
+<script>
+
+var body_ans=0;
+
+const videoElement = document.getElementsByClassName('input_video')[0];
+const canvasElement = document.getElementsByClassName('output_canvas')[0];
+const canvasCtx = canvasElement.getContext('2d');
+const camera = new Camera(videoElement, {
+    onFrame: async () => {
+        await pose.send({image: videoElement});
+    },
+      width: 360,
+      height: 440
+});
+
+function start(){
+    console.log("start");
+    camera.start();
+    
+}function stop(){
+    console.log("stop");
+    camera.stop();
+}
+
+function onResults(results) {
+    if(results.poseLandmarks!=undefined){
+    
+    var points=[results.poseLandmarks[13].x,results.poseLandmarks[13].y,
+    results.poseLandmarks[11].x,results.poseLandmarks[11].y,
+    results.poseLandmarks[23].x,results.poseLandmarks[23].y];
+    body_ans=print_angle(points);
+    console.log(body_ans);
+ }
+  canvasCtx.save();
+  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+  canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+  drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#ffffff', lineWidth: 4});
+  drawLandmarks(canvasCtx, results.poseLandmarks, {color: '#ffddff', lineWidth: 2});
+  canvasCtx.restore();
+
+}
+
+const pose = new Pose({locateFile: (file) => {
+      return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
+}});
+pose.setOptions({
+      modelComplexity: 1,
+      smoothLandmarks: true,
+      enableSegmentation: true,
+      smoothSegmentation: true,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5
+});
+pose.onResults(onResults);
+
+
+function download(){
+    console.log(pose_lists.toString());
+const blob = new Blob([pose_lists.toString()],{type:"text/plain"});
+const link = document.createElement('a');
+link.href = URL.createObjectURL(blob);
+link.download = 'sample.txt';
+link.click();
+}
+
+let input = document.getElementById('file');
+let reader = new FileReader();
+input.addEventListener('change', () => {
+    for(file of input.files){
+        //Fileオブジェクト(テキストファイル)のファイル内容を読み込む
+        reader.readAsText(file, 'UTF-8');
+        //ファイルの読み込み完了後に内容をコンソールに出力する
+        reader.onload = ()=> {
+          //  console.log(reader.result);
+            get_text(reader.result);
+        };
+    }
+});
+
+function get_text(texts){
+    var arr=texts.split(',');
+    var cut_count=0;
+    var count=0;
+    var result_arr=[];
+    var sub=new Array(66);
+
+    for(i=0;i<arr.length;i++){
+        if(arr[i]=='cut'){
+            cut_count++;
+            result_arr.push(sub.concat());
+        }
+    }
+
+    for(i=0;i<cut_count;i++){
+        for(j=0;j<66;j++){
+            result_arr[i][j]=arr[i*66+j+i];
+        }
+    }
+    marker(result_arr,cut_count);
+}
+var c2=document.getElementById('c');
+var c2_context=c2.getContext("2d");
+
+function marker(bodydata,cut_count) {
+    let body_count=0;
+
+    const intervalId=setInterval(()=>{
+        var body_p=[bodydata[body_count][13*2],bodydata[body_count][13*2+1],
+        bodydata[body_count][11*2],bodydata[body_count][11*2+1],
+        bodydata[body_count][23*2],bodydata[body_count][23*2+1]];
+
+        ans=print_angle(body_p);
+   
+            console.log(ans);
+
+            c2_context.save();
+            c2_context.clearRect(0, 0, c2.width, c2.height);
+            for(i=0;i<66;i=i+2){
+                c2_context.fillRect(bodydata[body_count][i]*c2.width,bodydata[body_count][i+1]*c2.height,10,10);
+            }
+            c2_context.restore();
+            body_count++;
+            if(body_count==cut_count){
+                //clearInterval(intervalId);
+                body_count=0;
+        }},100);
+}
+
+function print_angle(body_p){
+    var point1=[body_p[0],body_p[1]];
+            var point2=[body_p[2],body_p[3]];
+            var point3=[body_p[4],body_p[5]];
+            
+            var va=[point1[0]-point2[0],point1[1]-point2[1]];
+            var vb=[point3[0]-point2[0],point3[1]-point2[1]];
+
+            var dot=va[0]*vb[0]+va[1]*vb[1];
+            var absa=Math.sqrt(va[0]*va[0]+va[1]*va[1]);
+            var absb=Math.sqrt(vb[0]*vb[0]+vb[1]*vb[1]);
+
+            var ans=Math.acos(dot/(absa*absb))*(180 / Math.PI);
+    return ans;
+}
+
+</script>

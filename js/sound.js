@@ -49,6 +49,22 @@ const gainNode4 = Audio_ctx4.createGain();
 gainNode4.gain.value = VOLUME;
 nodeflag4=0;
 
+
+const Audio_ctx5 = new AudioContext();
+const gainNode5 = Audio_ctx5.createGain();
+gainNode5.gain.value = VOLUME;
+nodeflag5=0;
+
+const Audio_ctx6 = new AudioContext();
+const gainNode6 = Audio_ctx6.createGain();
+gainNode6.gain.value = VOLUME;
+nodeflag6=0;
+
+const Audio_ctx7 = new AudioContext();
+const gainNode7 = Audio_ctx7.createGain();
+gainNode7.gain.value = VOLUME;
+nodeflag7=0;
+
 function sounds0(sound_value){
     console.log(nodeflag0);
     if(nodeflag0==0){
@@ -146,5 +162,65 @@ function sounds_stop4(){
     if(typeof(oscillator4)!="undefined"){
     oscillator4.stop();
     nodeflag4=0;
+    }
+}
+
+function sounds5(sound_value){
+    console.log(nodeflag5);
+    if(nodeflag5==0){
+        oscillator5=Audio_ctx5.createOscillator();
+        oscillator5.type = "triangle";
+        oscillator5.frequency.setValueAtTime(sound_value, Audio_ctx5.currentTime);
+        oscillator5.connect(gainNode5).connect(Audio_ctx5.destination);
+        oscillator5.start();
+        nodeflag5=1;
+    }else{
+        console.log("重複");
+    }
+}
+function sounds_stop5(){
+    if(typeof(oscillator5)!="undefined"){
+    oscillator5.stop();
+    nodeflag5=0;
+    }
+}
+
+function sounds6(sound_value){
+    console.log(nodeflag6);
+    if(nodeflag6==0){
+        oscillator6=Audio_ctx6.createOscillator();
+        oscillator6.type = "triangle";
+        oscillator6.frequency.setValueAtTime(sound_value, Audio_ctx6.currentTime);
+        oscillator6.connect(gainNode6).connect(Audio_ctx6.destination);
+        oscillator6.start();
+        nodeflag6=1;
+    }else{
+        console.log("重複");
+    }
+}
+function sounds_stop6(){
+    if(typeof(oscillator6)!="undefined"){
+    oscillator6.stop();
+    nodeflag6=0;
+    }
+}
+
+function sounds7(sound_value){
+    console.log(nodeflag7);
+    if(nodeflag7==0){
+        oscillator7=Audio_ctx7.createOscillator();
+        oscillator7.type = "triangle";
+        oscillator7.frequency.setValueAtTime(sound_value, Audio_ctx7.currentTime);
+        oscillator7.connect(gainNode7).connect(Audio_ctx7.destination);
+        oscillator7.start();
+        nodeflag7=1;
+    }else{
+        console.log("重複");
+    }
+}
+function sounds_stop7(){
+    if(typeof(oscillator7)!="undefined"){
+    oscillator7.stop();
+    nodeflag7=0;
     }
 }
