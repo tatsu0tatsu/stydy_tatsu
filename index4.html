@@ -36,29 +36,48 @@
 
     <div style="float:left;">
     <button onclick="sounds0(261.626)">C4</button>
-    <button onclick="sounds_stop0()">stop</button><br>
+    <button onclick="sounds_stop0()">stop</button>
+    <button onclick="set_sound(0)">on</button>
+    <button onclick="off_sound(0)">off</button> <br>
     <button onclick="sounds1(293.665)">D4</button>
-    <button onclick="sounds_stop1()">stop</button><br>
+    <button onclick="sounds_stop1()">stop</button>
+    <button onclick="set_sound(1)">on</button>
+    <button onclick="off_sound(1)">off</button><br>
     <button onclick="sounds2(329.628)">E4</button>
-    <button onclick="sounds_stop2()">stop</button><br>
+    <button onclick="sounds_stop2()">stop</button>
+    <button onclick="set_sound(2)">on</button>
+    <button onclick="off_sound(2)">off</button><br>
     <button onclick="sounds3(349.228)">F4</button>
-    <button onclick="sounds_stop3()">stop</button><br>
+    <button onclick="sounds_stop3()">stop</button>
+    <button onclick="set_sound(3)">on</button>
+    <button onclick="off_sound(3)">off</button><br>
     <button onclick="sounds4(391.995)">G4</button>
-    <button onclick="sounds_stop4()">stop</button><br>
+    <button onclick="sounds_stop4()">stop</button>
+    <button onclick="set_sound(4)">on</button>
+    <button onclick="off_sound(4)">off</button><br>
     <button onclick="sounds5(440.000)">A4</button>
-    <button onclick="sounds_stop5()">stop</button><br>
+    <button onclick="sounds_stop5()">stop</button>
+    <button onclick="set_sound(5)">on</button>
+    <button onclick="off_sound(5)">off</button><br>
     <button onclick="sounds6(493.883)">B4</button>
-    <button onclick="sounds_stop6()">stop</button><br>
+    <button onclick="sounds_stop6()">stop</button>
+    <button onclick="set_sound(6)">on</button>
+    <button onclick="off_sound(6)">off</button><br>
     <button onclick="sounds7(523.251)">C5</button>
-    <button onclick="sounds_stop7()">stop</button><br>
+    <button onclick="sounds_stop7()">stop</button>
+    <button onclick="set_sound(7)">on</button>
+    <button onclick="off_sound(7)">off</button><br>
+
 </div>
 
 <div style="float:right;">
 <form name="body_form">
-
-    <label><input type="checkbox" name="chk1">右肩</label>
+    <label><input type="checkbox" name="chk1" value="13,11,23">右肩</label>
+    <label><input type="checkbox" name="chk1" value="14,12,24">左肩</label>
+    <label><input type="checkbox" name="chk1" value="11,13,15">右腕</label>
+    <label><input type="checkbox" name="chk1" value="12,14,16">右腕</label>
 </form>
-
+<input type="button" value="start" onclick="set_angle()">
 </div>
 
 
@@ -71,7 +90,15 @@
 
 <script>
 
-var body_ans=0;
+var sounds_on=[0,0,0,0,0,0,0];
+function set_sound(value){
+    sounds_on[value]=1;
+}
+function off_sound(value){
+    sounds_on[value]=0;
+}
+
+var body_list='a';
 
 const videoElement = document.getElementsByClassName('input_video')[0];
 const canvasElement = document.getElementsByClassName('output_canvas')[0];
@@ -95,12 +122,14 @@ function start(){
 
 function onResults(results) {
     if(results.poseLandmarks!=undefined){
-    
-    var points=[results.poseLandmarks[13].x,results.poseLandmarks[13].y,
-    results.poseLandmarks[11].x,results.poseLandmarks[11].y,
-    results.poseLandmarks[23].x,results.poseLandmarks[23].y];
-    body_ans=print_angle(points);
-    console.log(body_ans);
+        var list=[];
+        for(i=0;i<results.poseLandmarks.length;i++){
+        list.push(results.poseLandmarks[i].x.toFixed(4));
+        list.push(results.poseLandmarks[i].y.toFixed(4));
+    body_list=list;
+
+    }
+
  }
   canvasCtx.save();
   canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
@@ -143,12 +172,25 @@ input.addEventListener('change', () => {
         //ファイルの読み込み完了後に内容をコンソールに出力する
         reader.onload = ()=> {
           //  console.log(reader.result);
-            get_text(reader.result);
+            
         };
     }
 });
 
-function get_text(texts){
+function set_angle(){
+    var angles=[];
+    const chk1=document.body_form.chk1;
+    for(let i=0;i<chk1.length;i++){
+        if(chk1[i].checked){
+            angles.push(chk1[i].value.split(','));
+        }
+    }
+    if(reader.result){
+        get_text(reader.result,angles);
+    }
+}
+
+function get_text(texts,angles){
     var arr=texts.split(',');
     var cut_count=0;
     var count=0;
@@ -167,23 +209,34 @@ function get_text(texts){
             result_arr[i][j]=arr[i*66+j+i];
         }
     }
-    marker(result_arr,cut_count);
+    marker(result_arr,cut_count,angles);
 }
+
 var c2=document.getElementById('c');
 var c2_context=c2.getContext("2d");
 
-function marker(bodydata,cut_count) {
+function marker(bodydata,cut_count,angles) {
     let body_count=0;
 
     const intervalId=setInterval(()=>{
-        var body_p=[bodydata[body_count][13*2],bodydata[body_count][13*2+1],
-        bodydata[body_count][11*2],bodydata[body_count][11*2+1],
-        bodydata[body_count][23*2],bodydata[body_count][23*2+1]];
+        var ans=[];
+        var body_ans=[];
 
-        ans=print_angle(body_p);
+        for(let i=0;i<angles.length;i++){
+            body_p=[bodydata[body_count][angles[i][0]*2],bodydata[body_count][angles[i][0]*2+1],
+        bodydata[body_count][angles[i][1]*2],bodydata[body_count][angles[i][1]*2+1],
+        bodydata[body_count][angles[i][2]*2],bodydata[body_count][angles[i][2]*2+1]];
+            ans[i]=print_angle(body_p);
+
+            body_p1=[body_list[angles[i][0]*2],body_list[angles[i][0]*2+1],
+            body_list[angles[i][1]*2],body_list[angles[i][1]*2+1],
+            body_list[angles[i][2]*2],body_list[angles[i][2]*2+1]];
+            body_ans[i]=print_angle(body_p1);
+        }
+        result_sound(ans,body_ans);
+     
    
-            console.log(ans);
-
+    
             c2_context.save();
             c2_context.clearRect(0, 0, c2.width, c2.height);
             for(i=0;i<66;i=i+2){
@@ -213,4 +266,44 @@ function print_angle(body_p){
     return ans;
 }
 
+function result_sound(ans,b_ans){
+    onoff=[];
+
+    for(let i=0;i<ans.length;i++){
+        if(ans[i]-20<b_ans[i] && ans[i]+20>b_ans[i]){
+            onoff[i]=1;
+        }else{
+            onoff[i]=0;
+        }
+    }
+    console.log(onoff);
+
+    onoff_ans=onoff.every(function(val){
+        return val==1;
+    });
+    console.log(onoff_ans);
+
+    if(onoff_ans){
+
+        if(sounds_on[0]==1){sounds0(261.626);}else{sounds_stop0();}
+        if(sounds_on[1]==1){sounds1(293.665);}else{sounds_stop1();}
+        if(sounds_on[2]==1){sounds2(329.628);}else{sounds_stop2();}
+        if(sounds_on[3]==1){sounds3(349.228);}else{sounds_stop3();}
+        if(sounds_on[4]==1){sounds4(391.995);}else{sounds_stop4();}
+        if(sounds_on[5]==1){sounds5(440.000);}else{sounds_stop5();}
+        if(sounds_on[6]==1){sounds6(493.883);}else{sounds_stop6();}
+        if(sounds_on[7]==1){sounds7(523.251);}else{sounds_stop7();}
+    }else{
+        sounds_stop0();
+        sounds_stop1();
+        sounds_stop2();
+        sounds_stop3();
+        sounds_stop4();
+        sounds_stop5();
+        sounds_stop6();
+        sounds_stop7();
+    }
+}
+
+//本人とお手本の角度が一致したときの検証
 </script>

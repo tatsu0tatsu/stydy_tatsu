@@ -66,7 +66,7 @@ gainNode7.gain.value = VOLUME;
 nodeflag7=0;
 
 function sounds0(sound_value){
-    console.log(nodeflag0);
+
     if(nodeflag0==0){
         oscillator0=Audio_ctx0.createOscillator();
         oscillator0.type = "triangle";
@@ -74,8 +74,6 @@ function sounds0(sound_value){
         oscillator0.connect(gainNode0).connect(Audio_ctx0.destination);
         oscillator0.start();
         nodeflag0=1;
-    }else{
-        console.log("重複");
     }
 }
 function sounds_stop0(){
@@ -86,7 +84,7 @@ function sounds_stop0(){
 }
 
 function sounds1(sound_value){
-    console.log(nodeflag1);
+
     if(nodeflag1==0){
         oscillator1=Audio_ctx1.createOscillator();
         oscillator1.type = "triangle";
@@ -94,8 +92,6 @@ function sounds1(sound_value){
         oscillator1.connect(gainNode1).connect(Audio_ctx1.destination);
         oscillator1.start();
         nodeflag1=1;
-    }else{
-        console.log("重複");
     }
 }
 function sounds_stop1(){
@@ -106,7 +102,7 @@ function sounds_stop1(){
 }
 
 function sounds2(sound_value){
-    console.log(nodeflag2);
+
     if(nodeflag2==0){
         oscillator2=Audio_ctx2.createOscillator();
         oscillator2.type = "triangle";
@@ -114,8 +110,6 @@ function sounds2(sound_value){
         oscillator2.connect(gainNode2).connect(Audio_ctx2.destination);
         oscillator2.start();
         nodeflag2=1;
-    }else{
-        console.log("重複");
     }
 }
 function sounds_stop2(){
@@ -126,7 +120,7 @@ function sounds_stop2(){
 }
 
 function sounds3(sound_value){
-    console.log(nodeflag3);
+
     if(nodeflag3==0){
         oscillator3=Audio_ctx3.createOscillator();
         oscillator3.type = "triangle";
@@ -134,8 +128,6 @@ function sounds3(sound_value){
         oscillator3.connect(gainNode3).connect(Audio_ctx3.destination);
         oscillator3.start();
         nodeflag3=1;
-    }else{
-        console.log("重複");
     }
 }
 function sounds_stop3(){
@@ -146,7 +138,7 @@ function sounds_stop3(){
 }
 
 function sounds4(sound_value){
-    console.log(nodeflag4);
+
     if(nodeflag4==0){
         oscillator4=Audio_ctx4.createOscillator();
         oscillator4.type = "triangle";
@@ -154,8 +146,6 @@ function sounds4(sound_value){
         oscillator4.connect(gainNode4).connect(Audio_ctx4.destination);
         oscillator4.start();
         nodeflag4=1;
-    }else{
-        console.log("重複");
     }
 }
 function sounds_stop4(){
@@ -166,7 +156,7 @@ function sounds_stop4(){
 }
 
 function sounds5(sound_value){
-    console.log(nodeflag5);
+
     if(nodeflag5==0){
         oscillator5=Audio_ctx5.createOscillator();
         oscillator5.type = "triangle";
@@ -174,8 +164,6 @@ function sounds5(sound_value){
         oscillator5.connect(gainNode5).connect(Audio_ctx5.destination);
         oscillator5.start();
         nodeflag5=1;
-    }else{
-        console.log("重複");
     }
 }
 function sounds_stop5(){
@@ -186,7 +174,7 @@ function sounds_stop5(){
 }
 
 function sounds6(sound_value){
-    console.log(nodeflag6);
+
     if(nodeflag6==0){
         oscillator6=Audio_ctx6.createOscillator();
         oscillator6.type = "triangle";
@@ -194,8 +182,6 @@ function sounds6(sound_value){
         oscillator6.connect(gainNode6).connect(Audio_ctx6.destination);
         oscillator6.start();
         nodeflag6=1;
-    }else{
-        console.log("重複");
     }
 }
 function sounds_stop6(){
@@ -206,7 +192,7 @@ function sounds_stop6(){
 }
 
 function sounds7(sound_value){
-    console.log(nodeflag7);
+
     if(nodeflag7==0){
         oscillator7=Audio_ctx7.createOscillator();
         oscillator7.type = "triangle";
@@ -214,8 +200,6 @@ function sounds7(sound_value){
         oscillator7.connect(gainNode7).connect(Audio_ctx7.destination);
         oscillator7.start();
         nodeflag7=1;
-    }else{
-        console.log("重複");
     }
 }
 function sounds_stop7(){
