@@ -1,0 +1,177 @@
+
+<html>
+    <head>
+        <title>sound</title>
+        <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+    </head>
+    <body>
+
+<div style="width:800px;">
+
+<div style="float:left;">
+<div style="width:360px;height:440px;border:solid 1px #000;">
+    <video class="input_video" style="display:none;"></video>
+    <canvas class="output_canvas" width="360px" height="440px"></canvas>
+</div>
+
+<button id="start" onclick="start();">start</button>
+<button id="stop" onclick="stop();">stop</dbutton>
+</div>
+
+
+
+
+<div style="clear:both;">
+</div>
+
+  
+
+
+<canvas id="canvas" width="500" height="200" style="border:1px solid #000000;"></canvas><br>
+<button id="startButton">Start</button>
+<span id="errorMessage"></span>
+
+<button onclick="sounds0(261.626)">C4</button>
+<button onclick="sounds_stop0()">stop</button>
+
+</div>
+    </body>
+    <script src="./js/sound.js"></script>
+</html>
+
+
+
+<script>
+//音のログをとる、運動に対して自動的になる音をPCのマイクから取得→とりあえず画面出力
+//おとやひかくしたいかくどの設定方法を検討、ポーズをしたときに音を設定など、音声入力など、ジェスチャ＋声など、上で手をたたく（場所と音）
+
+
+const videoElement = document.getElementsByClassName('input_video')[0];
+const canvasElement = document.getElementsByClassName('output_canvas')[0];
+const canvasCtx = canvasElement.getContext('2d');
+const camera = new Camera(videoElement, {
+    onFrame: async () => {
+        await pose.send({image: videoElement});
+    },
+      width: 360,
+      height: 440
+});
+
+function start(){
+    console.log("start");
+    camera.start();
+    
+}function stop(){
+    console.log("stop");
+    camera.stop();
+}
+
+function onResults(results) {
+    if(results.poseLandmarks!=undefined){
+        var list=[];
+        for(i=0;i<results.poseLandmarks.length;i++){
+        list.push(results.poseLandmarks[i].x.toFixed(4));
+        list.push(results.poseLandmarks[i].y.toFixed(4));
+    body_list=list;
+
+    }
+
+ }
+  canvasCtx.save();
+  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+  canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+  drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#ffffff', lineWidth: 4});
+  drawLandmarks(canvasCtx, results.poseLandmarks, {color: '#ffddff', lineWidth: 2});
+  canvasCtx.restore();
+
+}
+
+const pose = new Pose({locateFile: (file) => {
+      return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
+}});
+pose.setOptions({
+      modelComplexity: 1,
+      smoothLandmarks: true,
+      enableSegmentation: true,
+      smoothSegmentation: true,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5
+});
+pose.onResults(onResults);
+
+
+
+
+var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+var analyser = audioCtx.createAnalyser();
+
+
+let canvasCtx1 = canvas.getContext("2d");
+let WIDTH = canvas.width;
+let HEIGHT = canvas.height;
+
+let stream;
+startButton.onclick = async function () {
+  if (stream) return;
+  try {
+    await audioCtx.resume();
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio: true
+    });
+    audioCtx.createMediaStreamSource(stream).connect(analyser);
+  } catch (err) {
+    errorMessage.textContent = err.toString();
+  }
+};
+
+analyser.fftSize = 2048;
+var bufferLength = analyser.frequencyBinCount;
+var dataArray = new Uint8Array(bufferLength);
+analyser.getByteTimeDomainData(dataArray);
+
+//声を出してみてdataArrayの中身をみる、それを周波数に、それをドレミに？
+
+function draw() {
+  drawVisual = requestAnimationFrame(draw);
+// それぞれの周波数の振幅を取得https://ics.media/entry/230421/
+//https://nogson2.hatenablog.com/entry/2017/10/16/191205
+  //analyser.getByteTimeDomainData(dataArray);
+  analyser.getByteFrequencyData(dataArray);
+  canvasCtx1.fillStyle = "rgb(200, 200, 200)";
+  canvasCtx1.fillRect(0, 0, WIDTH, HEIGHT);
+
+  canvasCtx1.lineWidth = 2;
+  canvasCtx1.strokeStyle = "rgb(0, 0, 0)";
+
+  canvasCtx1.beginPath();
+
+  var sliceWidth = (WIDTH * 1.0) / bufferLength;
+  var x = 0;
+
+  var maxvalue=dataArray.reduce((a,b)=>Math.max(a,b))
+  console.log(dataArray.indexOf(maxvalue)*44100/2048);
+  //A4=約494Hzが18
+  //console.log(dataArray)
+
+  for (var i = 0; i < bufferLength; i++) {
+    var v = dataArray[i] / 128.0;
+    var y = (v * HEIGHT) / 2;
+
+    if (i === 0) {
+      canvasCtx1.moveTo(x, y);
+    } else {
+      canvasCtx1.lineTo(x, y);
+    }
+
+    x += sliceWidth;
+  }
+
+  canvasCtx1.lineTo(canvas.width, canvas.height / 2);
+  canvasCtx1.stroke();
+}
+
+draw();
+
+</script>

@@ -276,13 +276,21 @@ function result_sound(ans,b_ans){
             onoff[i]=0;
         }
     }
-    console.log(onoff);
+    console.log(ans-b_ans);
+
+    if(ans-b_ans<20 && ans-b_ans>-20){
+        sounds0(349.228);
+        sounds_stop1();
+
+    }else{
+        sounds_stop0();
+        sounds1(261.626);
+    }
 
     onoff_ans=onoff.every(function(val){
         return val==1;
     });
-    console.log(onoff_ans);
-
+/*
     if(onoff_ans){
 
         if(sounds_on[0]==1){sounds0(261.626);}else{sounds_stop0();}
@@ -302,7 +310,7 @@ function result_sound(ans,b_ans){
         sounds_stop5();
         sounds_stop6();
         sounds_stop7();
-    }
+    }}*/
 }
 
 //本人とお手本の角度が一致したときの検証
